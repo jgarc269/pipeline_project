@@ -16,11 +16,14 @@ driver_state::~driver_state()
 // are not known when this class is constructed.
 void initialize_render(driver_state& state, int width, int height)
 {
+    driver_state* state = new driver_state;
+
     state.image_width=width;
     state.image_height=height;
     state.image_color=0;
     state.image_depth=0;
-    std::cout<<"TODO: allocate and initialize state.image_color and state.image_depth."<<std::endl;
+    //std::cout<<"TODO: allocate and initialize state.image_color and state.image_depth."<<std::endl;
+
 }
 
 // This function will be called to render the data that has been stored in this class.
@@ -32,7 +35,15 @@ void initialize_render(driver_state& state, int width, int height)
 //   render_type::strip -    The vertices are to be interpreted as a triangle strip.
 void render(driver_state& state, render_type type)
 {
-    std::cout<<"TODO: implement rendering."<<std::endl;
+    //std::cout<<"TODO: implement rendering."<<std::endl;
+    switch(type)
+    {
+        case render_type::triangle:
+        data_geometry* dg[3];
+
+       // rasterize_triangle(state, dg[3]);
+        break;
+    }
 }
 
 
