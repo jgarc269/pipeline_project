@@ -38,17 +38,35 @@ void render(driver_state& state, render_type type)
     switch(type)
     {
         case render_type::triangle:
-        data_geometry* dg[3];
+	{
 
-       // rasterize_triangle(state, dg[3]);
-        break;	
-	case render_type::indexed:
-	break;
-	case render_type::fan:
-	break;
-	case render_type::strip:
-	break;
+	    const data_geometry *dg[3];
+            data_geometry temp[3];
+            data_vertex dv[3];
 
+	        for(int i = 0; i < state.num_vertices; i++)
+	        {
+	            for(int j = 0; j < state.floats_per_vertex; j++)
+	            {
+		            temp[j].data = dv[j].data;
+                    state.vertex_shader(dv[j], temp[j], state.uniform_data);
+                    dg[j] = &temp[j]; 
+	             }
+		
+	        }
+        	rasterize_triangle(state, dg);
+	   break;
+	}	
+/*
+	    case render_type::indexed:
+	    break;
+
+	    case render_type::fan:
+	    break;
+        
+	    case render_type::strip:
+	    break;
+*/
     }
 }
 

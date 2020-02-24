@@ -37,11 +37,13 @@ void render(driver_state& state, render_type type)
     //std::cout<<"TODO: implement rendering."<<std::endl;
     switch(type)
     {
-        const data_geometry *dg[3];
-        data_geometry temp[3];
-        data_vertex dv[3];
-
         case render_type::triangle:
+	{
+
+	    const data_geometry *dg[3];
+            data_geometry temp[3];
+            data_vertex dv[3];
+
 	        for(int i = 0; i < state.num_vertices; i++)
 	        {
 	            for(int j = 0; j < state.floats_per_vertex; j++)
@@ -52,9 +54,10 @@ void render(driver_state& state, render_type type)
 	             }
 		
 	        }
-        rasterize_triangle(state, dg);
-        break;	
-
+        	rasterize_triangle(state, dg);
+	   break;
+	}	
+/*
 	    case render_type::indexed:
 	    break;
 
@@ -63,7 +66,7 @@ void render(driver_state& state, render_type type)
         
 	    case render_type::strip:
 	    break;
-
+*/
     }
 }
 
