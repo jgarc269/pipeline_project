@@ -40,17 +40,7 @@ void render(driver_state& state, render_type type)
         case render_type::triangle:
         data_geometry* dg[3];
 
-	for(int i = 0; i < state.num_vertices; i++)
-	{
-	    float* data;
-	    for(int j = 0; j < state.floats_per_vertex; j++)
-	    {
-		//data = 
-	    }
-		
-	    dg.data[i] = data; 
-	}
-        rasterize_triangle(state, dg);
+       // rasterize_triangle(state, dg[3]);
         break;	
 	case render_type::indexed:
 	break;
