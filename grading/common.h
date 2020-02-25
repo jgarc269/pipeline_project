@@ -2,6 +2,7 @@
 #define __COMMON_H__
 
 #include "vec.h"
+#include <limits>
 
 // This file contains common data types and definitions that are used elsewhere
 // in this project.  You should not need to make any changes in this file.
