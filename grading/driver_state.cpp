@@ -55,7 +55,7 @@ void render(driver_state& state, render_type type)
 		unsigned int k = 0;
 	    	for(int i = 0; i < state.num_vertices / triangle_edges; i++)
 	        {
-	            for(int j = 0; j < triangle_edges; k += state.floats_per_vertex)
+	            for(int j = 0; j < triangle_edges; k = k + state.floats_per_vertex)
 	            {
 			    in[j].data = &state.vertex_data[k];
 		            temp[j].data = in[j].data;
@@ -104,9 +104,7 @@ void clip_triangle(driver_state& state, const data_geometry* in[3],int face)
 // fragments, calling the fragment shader, and z-buffering.
 void rasterize_triangle(driver_state& state, const data_geometry* in[3])
 {
-/*
-    //std::cout<<"TODO: implement rasterization"<<std::endl;
-    
+
     float a[3];
     float b[3];
     float c[3];
@@ -126,9 +124,9 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
    // vec3 vertices[3];
     for(int temp = 0; temp < 3; temp++)
     {
-        float i = (width_div * ((*in)[temp].gl_Position[0]/(*in)[temp].gl_Position[3]) + (width_div - 0.5f));
-        float j = (height_div * ((*in)[temp].gl_Position[1]/(*in)[temp].gl_Position[3]) + (height_div - 0.5f));
-        float k = (width_div * ((*in)[temp].gl_Position[2]/(*in)[temp].gl_Position[3]) + (width_div - 0.5f));
+        float i = (width_div * ((*in)[temp].gl_Position[0] / (*in)[temp].gl_Position[3]) + (width_div - 0.5f));
+        float j = (height_div * ((*in)[temp].gl_Position[1] / (*in)[temp].gl_Position[3]) + (height_div - 0.5f));
+        float k = (width_div * ((*in)[temp].gl_Position[2] / (*in)[temp].gl_Position[3]) + (width_div - 0.5f));
        
 	a[temp] = i;
         b[temp] = j;
@@ -181,8 +179,10 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
             float gamma = (0.5f * ((a[0] * b[1] - a[1] * b[0]) + (a[0] - b[1]) * i + (a[1] - a[0]) * j)) / area;
 	   
 	   if(alpha >= 0 && beta >= 0 && gamma >= 0) 
-	    state.image_color[i + j * state.image_width] = make_pixel(255,255,255);
+	   {
+	   	state.image_color[i + j * state.image_width] = make_pixel(255,255,255);
+	   }
 	}
     }
-*/
+
 }
