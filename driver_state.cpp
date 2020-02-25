@@ -17,10 +17,13 @@ driver_state::~driver_state()
 void initialize_render(driver_state& state, int width, int height)
 {
   
-    state.image_width=width;
-    state.image_height=height;
-    state.image_color= new pixel[width * height];
-    state.image_depth= new float[width * height];
+    state.image_width = width;
+    state.image_height = height;
+    state.image_color = NULL; 
+    state.image_depth = NULL;
+
+    state.image_color = new pixel[width * height];
+    state.image_depth = new float[width * height];
 	
     for(int i = 0; i < width * height; i++)
     {
@@ -39,17 +42,18 @@ void initialize_render(driver_state& state, int width, int height)
 void render(driver_state& state, render_type type)
 {
     //std::cout<<"TODO: implement rendering."<<std::endl;
+    
+    const int triangle_edges = 3;
+    const data_geometry *dg[3];
+    data_geometry temp[3];
+    data_vertex in[3];
+    unsigned int k = 0;
+    
     switch(type)
-    {
+    {	
         case render_type::triangle:
 	{ 
-	    const int triangle_edges = 3;
-	    const data_geometry *dg[3];
-            data_geometry temp[3];
-            data_vertex in[3]; 
-	    unsigned int k = 0;
-
-	        for(int i = 0; i < state.num_vertices / triangle_edges; i++)
+	    	for(int i = 0; i < state.num_vertices / triangle_edges; i++)
 	        {
 	            for(int j = 0; j < triangle_edges; k = k + state.floats_per_vertex)
 	            {
@@ -64,7 +68,7 @@ void render(driver_state& state, render_type type)
 			            
 		break;
 	}	
-/*
+
 	    case render_type::indexed:
 	    break;
 
@@ -73,7 +77,7 @@ void render(driver_state& state, render_type type)
         
 	    case render_type::strip:
 	    break;
-*/
+
     }
 }
 
@@ -115,16 +119,21 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     //and y from 0 to height. You will also need to account for the fact that the NDC (-1, -1) corresponds to the bottom left corner of the screen
     // but not the center of the bottom left pixel. Given (x, y) in NDC, what equation gives you (i, j) in pixel space 
     // (use w to denote width and h to denote height). 
+    vec3 vertices[3];
     for(int temp = 0; temp < 3; temp++)
     {
         float i = (width_div * ((*in)[temp].gl_Position[0]/(*in)[temp].gl_Position[3]) + (width_div - 0.5f));
         float j = (height_div * ((*in)[temp].gl_Position[1]/(*in)[temp].gl_Position[3]) + (height_div - 0.5f));
         float k = (width_div * ((*in)[temp].gl_Position[2]/(*in)[temp].gl_Position[3]) + (width_div - 0.5f));
-        a[temp] = i;
-        b[temp] = j;
-        c[temp] = k;
+        vertices[temp][0] = i;
+        vertices[temp][1] = j;
+        vertices[temp][2] = k;
     } 
 	
+//    state.image_color[a[0], a[1], a[2]] = make_pixel(255,255,255);
+//    state.image_color[b[0], b[1], b[2]] = make_pixel(255,255,255);
+//    state.image_color[c[0], c[1], c[2]] = make_pixel(255,255,255);
+
     // Min and Max of Triangle
     float min_a = std::min(std::min(a[0], a[1]), a[2]);
     float min_b = std::min(std::min(b[0], b[1]), b[2]);
@@ -159,6 +168,8 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     //Say you are in the pixel with indices (i, j). 
     //You can use the barycentric coordinates of this pixel (i, j) to know if this pixel falls inside the triangle or not. 
     //Barycentric coordinates can be calculated using triangle areas. 
+
+/*
     for(int j = min_b; j < max_b; j++)
     {
 	for(int i = min_a; i < max_a; i++)
@@ -170,5 +181,6 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
 	    state.image_color[i + j * state.image_width] = make_pixel(255,255,255);
 	}
     }
+*/
 }
 
