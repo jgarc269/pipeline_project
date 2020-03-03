@@ -46,7 +46,7 @@ void render(driver_state& state, render_type type)
     switch(type) 
     {
         case render_type::triangle: 
-	{
+	{	
             unsigned int k = 0;
             for (int i = 0; i < state.num_vertices / triangle_points; i++)
 	    {
@@ -135,6 +135,11 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
     // AREA(abc) = 0.5 * ((bxcy − cxby ) − (axcy − cxay) + (axby − bxay))
     float AREA_abc = (0.5f * ((a[1]*b[2] - a[2]*b[1]) - (a[0]*b[2] - a[2]*b[0]) + (a[0]*b[1] - a[1]*b[0])));
  
+    // Use the fragment shader to calculate the pixel color rather than setting to white. 
+    // See ​data_output in common.h a​ nd the ​fragment_shader​ function in ​driver_state.h.
+    auto *data = new float[state.floats_per_vertex];
+    data_fragment frag{data};
+    data_output output; 
 
     // To rasterize the triangle, you can iterate over all pixels of the image. 
     // Say you are in the pixel with indices (i, j). You can use the barycentric coordinates of this pixel (i, j)
@@ -158,10 +163,53 @@ void rasterize_triangle(driver_state& state, const data_geometry* in[3])
 		pixel = i + j * state.image_width;
                 if(z < state.image_depth[pixel])
 	    	{
-                    state.image_depth[pixel] = z;
-                    state.image_color[pixel] = make_pixel(255,255,255);
+                    state.image_depth[pixel] = z;     
+                  
+		   // Implement color interpolation by checking ​interp_rules in ​driver_state
+		   // before sending the color to the fragment_shader. 
+		   // You have one interp_rule for each float in the ​data_geometry.data​. 
+		   // If the rule type is noperspective (​ see interpolation types in ​common.h)​ , 
+		   // then interpolate the float from the 3 vertices using the barycentric coordinates.
+                   for (int k = 0; k < state.floats_per_vertex; k++)
+		   {
+                        switch (state.interp_rules[k])
+			{
+
+			    float temp; // Did not let me delcare this in smooth for some reason
+					// so moved it outside of the everything
+			    case interp_type::invalid:
+			    break;
+
+                            case interp_type::flat: 
+                                frag.data[k] = (*in)[0].data[k];
+                                break;
+
+                            case interp_type::smooth:                               
+                                temp = (w / (*in)[0].gl_Position[3]) + (x / (*in)[1].gl_Position[3]) + (y / (*in)[2].gl_Position[3]);
+
+                                alpha = w / (temp * (*in)[0].gl_Position[3]);
+                                beta = x / (temp * (*in)[1].gl_Position[3]);
+                                gamma = y / (temp * (*in)[2].gl_Position[3]);
+
+                            case interp_type::noperspective:
+                                frag.data[k] = alpha * (*in)[0].data[k] + beta * (*in)[1].data[k] + gamma * (*in)[2].data[k];
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+
+			state.fragment_shader(frag, output, state.uniform_data);
+
+                        state.image_color[pixel] = make_pixel(output.output_color[0] * 255, output.output_color[1] * 255, output.output_color[2] * 255);
+			
+                   // state.image_color[pixel] = make_pixel(255,255,255);
                 }
             }
         }
    }
+
+	delete [] data;
+
 }
